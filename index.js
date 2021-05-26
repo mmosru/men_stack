@@ -1,3 +1,5 @@
+'use strict';
+
 const express = require('express');
 const path = require('path');
 
@@ -19,6 +21,8 @@ const BlogPost = require('./models/BlogPost.js');
 
 app.get('/', async (req, res) => {
     const blogposts = await BlogPost.find({});
+    console.log(req.query.search);
+    // const blogposts = await BlogPost.find({title:/yoga/i});
     res.render('index', {
         blogposts: blogposts
     });
@@ -33,8 +37,9 @@ app.get('/contact', (req, res) => {
     res.render('contact');
 });
 
-app.get('/post', (req, res) => {
-    res.render('post');
+app.get('/post/:id', async (req, res) => {
+    const blogpost = await BlogPost.findById(req.params.id);
+    res.render('post', {blogpost});
 });
 
 app.get('/posts/new', (req, res) => {
