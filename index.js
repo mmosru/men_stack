@@ -16,41 +16,37 @@ const bodyParser = require('body-parser');
 app.use(bodyParser.json());
 app.use(bodyParser.urlencoded({extended: true}));
 
+const fileUpload = require('express-fileupload');
+app.use(fileUpload());
+
+const validateMiddleWare = (req, res, next) => {
+    if (req.files == null || req.body.title == null || req.body.body == null) {
+        console.log("mmo redirecting!\n\n");
+        console.log(req);
+        return res.redirect('/posts/new');
+    }
+    next();
+}
+
+app.use('/posts/store', validateMiddleWare);
 // Models:
 const BlogPost = require('./models/BlogPost.js');
 
-app.get('/', async (req, res) => {
-    const blogposts = await BlogPost.find({});
-    console.log(req.query.search);
-    // const blogposts = await BlogPost.find({title:/yoga/i});
-    res.render('index', {
-        blogposts: blogposts
-    });
-    console.log(blogposts);
-});
-
-app.get('/about', (req, res) => {
-    res.render('about');
-});
-
-app.get('/contact', (req, res) => {
-    res.render('contact');
-});
 
 app.get('/post/:id', async (req, res) => {
     const blogpost = await BlogPost.findById(req.params.id);
     res.render('post', {blogpost});
 });
 
-app.get('/posts/new', (req, res) => {
-    res.render('create');
-});
+const homeController = require('./controllers/home');
+const newPostController = require('./controllers/newPost');
+const storePostController = require('./controllers/storePost');
+const getPostController = require('./controllers/getPost');
 
-app.post('/posts/store', async (req, res) => {
-    // console.log(req.body); // delete this soon
-    await BlogPost.create(req.body);
-    res.redirect('/');
-});
+app.get('/', homeController);
+app.get('/posts/new', newPostController);
+app.post('/posts/store', storePostController);
+app.get('/post/:id', getPostController);
 
 
 app.listen(4000, () => {
