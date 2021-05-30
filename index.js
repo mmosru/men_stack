@@ -19,16 +19,9 @@ app.use(bodyParser.urlencoded({extended: true}));
 const fileUpload = require('express-fileupload');
 app.use(fileUpload());
 
-const validateMiddleWare = (req, res, next) => {
-    if (req.files == null || req.body.title == null || req.body.body == null) {
-        console.log("mmo redirecting!\n\n");
-        console.log(req);
-        return res.redirect('/posts/new');
-    }
-    next();
-}
-
+const validateMiddleWare = require("./middleware/validateMiddleware.js")
 app.use('/posts/store', validateMiddleWare);
+
 // Models:
 const BlogPost = require('./models/BlogPost.js');
 
@@ -38,6 +31,7 @@ app.get('/post/:id', async (req, res) => {
     res.render('post', {blogpost});
 });
 
+// Controllers:
 const homeController = require('./controllers/home');
 const newPostController = require('./controllers/newPost');
 const storePostController = require('./controllers/storePost');
